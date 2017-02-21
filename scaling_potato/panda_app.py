@@ -6,6 +6,9 @@ from direct.task import Task
 from math import pi, sin, cos
 
 
+__author__ = "Aaron M. de Windt"
+
+
 class PandaApp(ShowBase):
     def __init__(self, pilons=None):
         ShowBase.__init__(self)
@@ -61,8 +64,6 @@ class PandaApp(ShowBase):
 
         # self.camera.setPos(0, -20, 3)
         self.trackball.node().setPos(0, 20, -3)
-
-        print(self.camera.getPos())
 
     def load_pilons(self):
         self.pilon_models = []
