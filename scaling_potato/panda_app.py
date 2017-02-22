@@ -31,14 +31,9 @@ class PandaApp(ShowBase):
 
     # Define a procedure to move the camera.
     def main_loop(self, task):
-        # angleDegrees = task.time * 6.0
-        # angleRadians = angleDegrees * (pi / 180.0)
-        # self.camera.setPos(20 * sin(angleRadians), -20.0 * cos(angleRadians), 3)
-        # self.camera.setHpr(angleDegrees, 0, 0)
-
         self.quadcopter.step(task.time)
         self.quadcopter.a = np.array([1, 0, 0])
-        # self.quadcopter.yaw_acc = 0.1 * pi
+        self.quadcopter.omega_dot = [0, 0, 0]
         return Task.cont
 
     def load_scene(self):
