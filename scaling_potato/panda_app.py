@@ -5,6 +5,9 @@ from direct.task import Task
 
 from math import pi, sin, cos
 
+import numpy as np
+
+from scaling_potato.quadcopter import Quadcopter
 
 __author__ = "Aaron M. de Windt"
 
@@ -21,15 +24,21 @@ class PandaApp(ShowBase):
         self.load_scene()
         self.load_pilons()
 
-        self.taskMgr.add(self.spinCameraTask, "SpinCameraTask")
+        self.taskMgr.add(self.main_loop, "main_loop")
+
+        self.quadcopter = Quadcopter([0, -20, 3], self)
+
 
     # Define a procedure to move the camera.
-    def spinCameraTask(self, task):
+    def main_loop(self, task):
         # angleDegrees = task.time * 6.0
         # angleRadians = angleDegrees * (pi / 180.0)
         # self.camera.setPos(20 * sin(angleRadians), -20.0 * cos(angleRadians), 3)
         # self.camera.setHpr(angleDegrees, 0, 0)
-        print self.camera.getPos()
+
+        self.quadcopter.step(task.time)
+        self.quadcopter.a = np.array([1, 0, 0])
+        # self.quadcopter.yaw_acc = 0.1 * pi
         return Task.cont
 
     def load_scene(self):
