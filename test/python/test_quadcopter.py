@@ -18,7 +18,7 @@ class TestQuadcopter(unittest.TestCase):
         qc.state_vector = np.array([9., 8., 7., 6., 5., 4., 3., 2])
         npt.assert_allclose(qc.state_vector, [9., 8., 7., 6., 5., 4., 3., 2])
         npt.assert_allclose(qc.x, np.array([9., 8., 7.]))
-        npt.assert_allclose(qc.v, np.array([6., 5., 4.]))
+        npt.assert_allclose(qc.v_i, np.array([6., 5., 4.]))
         self.assertAlmostEqual(qc.yaw, 3.)
         self.assertAlmostEqual(qc.yaw_rate, 2.)
 
@@ -27,18 +27,18 @@ class TestQuadcopter(unittest.TestCase):
         npt.assert_allclose(qc.state_vector_dot, [0, 0, 0, 0, 0, 0, 0, 0])
         qc.state_vector_dot = np.array([9., 8., 7., 6., 5., 4., 3., 2])
         npt.assert_allclose(qc.state_vector_dot, [9., 8., 7., 6., 5., 4., 3., 2])
-        npt.assert_allclose(qc.v, np.array([9., 8., 7.]))
-        npt.assert_allclose(qc.a, np.array([6., 5., 4.]))
+        npt.assert_allclose(qc.v_i, np.array([9., 8., 7.]))
+        npt.assert_allclose(qc.a_i, np.array([6., 5., 4.]))
         self.assertAlmostEqual(qc.yaw_rate, 3.)
         self.assertAlmostEqual(qc.yaw_acc, 2.)
 
     def test_simple_simulation(self):
         qc = Quadcopter([0, 0, 0])
-        qc.a = np.array([[1, 0, 0]])
+        qc.a_i = np.array([[1, 0, 0]])
         qc.step(0)
         qc.step(1)
         npt.assert_allclose(qc.x, np.array([.5, 0., 0.]))
-        npt.assert_allclose(qc.v, np.array([1., 0., 0.]))
+        npt.assert_allclose(qc.v_i, np.array([1., 0., 0.]))
 
     def test_yaw_simulation(self):
         qc = Quadcopter([0, 0, 0])

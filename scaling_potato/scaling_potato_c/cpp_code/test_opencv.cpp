@@ -1,22 +1,31 @@
-#include <stdio.h>
+//
+// Created by elviento on 3/9/17.
+//
+
+#include <iostream>
+
+#include "test_opencv.h"
 #include <opencv2/opencv.hpp>
+
+
+int i = 0;
 
 using namespace cv;
 
-int main(int argc, char** argv )
-{
+
+void test_opencv() {
+
     Mat image;
     image = imread( "/home/elviento/stuff/projects/rnd/scaling-potato/resources/Lenna.png", 1 );
 
     if ( !image.data )
     {
         printf("No image data \n");
-        return -1;
+        return;
     }
     namedWindow("Display Image", WINDOW_AUTOSIZE );
     imshow("Display Image", image);
 
     waitKey(0);
-
-    return 0;
 }
+

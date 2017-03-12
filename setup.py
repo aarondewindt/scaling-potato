@@ -1,22 +1,141 @@
-from setuptools import setup, find_packages
-from distutils.util import convert_path
+import os
+import os.path
+from distutils.core import setup
+from Cython.Build import cythonize
+from distutils.extension import Extension
 
-main_ns = {}
-ver_path = convert_path('scaling_potato/__init__.py')
-with open(ver_path) as ver_file:
-    exec(ver_file.read(), main_ns)
 
-setup(
-    name='scaling_potato',
-    version=main_ns['__version__'],
-    description='Project for testing computer vision algorithms to control a quadcopter.',
-    author='Aaron de Windt',
-    author_email='aaron.dewindt@gmail.com',
+def main():
+    scaling_potato_ext = create_scaling_potato_ext()
 
-    install_requires=['numpy', 'scipy'],  # panda3d as well but you'll have to do this seperately.
-    packages=find_packages('.', exclude=["test"]),
+    setup(name="scaling_potato",
+          ext_modules=scaling_potato_ext)
 
-    classifiers=[
-        'Programming Language :: Python :: 2 :: Only',
-        'Development Status :: 2 - Pre-Alpha'],
-)
+
+def create_scaling_potato_ext():
+    sc = SourcesCollectorClass()
+
+    cython_source = "./scaling_potato/scaling_potato_c/scaling_potato_c.pyx"
+
+    sc.add_c_source_dir("./scaling_potato/scaling_potato_c/cpp_code")
+    sc.add_include_dir("./scaling_potato/scaling_potato_c/cpp_code")
+
+    # sc.add_library_dir(os.environ["OPENCV_LIB"])
+    sc.add_include_dir(os.environ["OPENCV_INC"])
+
+    sc.add_library("opencv_core")
+    sc.add_library("opencv_imgproc")
+    sc.add_library("opencv_imgcodecs")
+    sc.add_library("opencv_highgui")
+    sc.add_library("opencv_ml")
+    sc.add_library("opencv_videoio")
+    sc.add_library("opencv_video")
+    sc.add_library("opencv_features2d")
+    sc.add_library("opencv_calib3d")
+    sc.add_library("opencv_objdetect")
+    sc.add_library("opencv_flann")
+
+    printb("scaling_potato_c")
+    print("="*80)
+    sc.print_lists()
+    print('\n'*2)
+
+    ext = None
+
+    ext = Extension("scaling_potato.scaling_potato_c",
+                    sources=[cython_source]+sc.c_sources_list,
+                    include_dirs=sc.includes,
+                    library_dirs=sc.lib_dirs,
+                    libraries=sc.libraries,
+                    language="c++",
+                    extra_compile_args=["-g"], #, "/Od", "/MDd"], # for release version change /Od compile arg to /O2 (optimization for maximum speed)
+                    # extra_link_args=["-debug"], # leave this enabled for release! :)))
+                    define_macros = [('PYTHON_EXT', '1')]
+                    )
+
+    ext = cythonize([ext])
+    print('\n'*4)
+    return ext
+
+
+class SourcesCollectorClass(object):
+    def __init__(self):
+        self.c_sources_list = []
+        self.cython_sources_list = []
+        self.includes = []
+        self.libraries = []
+        self.lib_dirs = []
+
+    def print_lists(self):
+        print("Cython sources")
+        for src in self.cython_sources_list:
+            print(src)
+
+        print('\nC sources')
+        for src in self.c_sources_list:
+            print(src)
+
+        print('\nInclude directories')
+        for src in self.includes:
+            print(src)
+
+        print('\nLibrary dirs')
+        for src in self.lib_dirs:
+            print(src)
+
+        print('\nLibraries')
+        for src in self.libraries:
+            print(src)
+
+    def add_library_dir(self, path):
+        self.lib_dirs.append(path)
+
+    def add_library(self, lib_name):
+        self.libraries.append(lib_name)
+
+    def add_include_dir(self, path):
+        self.includes.append(os.path.abspath(path))
+
+    def add_c_source(self, path):
+        exts = ['.c', '.cpp']
+        path = os.path.abspath(path)
+        if os.path.isfile(path):
+            ext = os.path.splitext(path)[1]
+            if ext in exts:
+                self.c_sources_list.append(path)
+
+    def add_c_source_dir(self, path):
+        for file in os.listdir(path):
+            self.add_c_source(os.path.join(path, file))
+
+    def add_cython_source(self, path):
+        exts = ['.pyx'];
+        path = os.path.abspath(path)
+        if os.path.isfile(path):
+            ext = os.path.splitext(path)[1]
+            if ext in exts:
+                self.cython_sources_list.append(path)
+
+    def add_cython_source_dir(self, path):
+        for root, _, files in os.walk(path):
+            for file in files:
+                self.add_cython_source(os.path.join(root, file))
+
+
+try:
+    from pyfiglet import Figlet
+    figlet = Figlet(font='small')
+except:
+    figlet = None
+
+
+def printb(s):
+    if figlet is not None:
+        print(figlet.renderText(s))
+    else:
+        print(s)
+
+
+
+if __name__ == "__main__":
+    main()
