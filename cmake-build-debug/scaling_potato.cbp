@@ -135,6 +135,12 @@
 		<Unit filename="/home/elviento/stuff/projects/rnd/scaling-potato/exp/main.cpp">
 			<Option target="exp"/>
 		</Unit>
+		<Unit filename="/home/elviento/stuff/projects/rnd/scaling-potato/scaling_potato/scaling_potato_c/cpp_code/Camera.cpp">
+			<Option target="scaling_potato"/>
+		</Unit>
+		<Unit filename="/home/elviento/stuff/projects/rnd/scaling-potato/scaling_potato/scaling_potato_c/cpp_code/Camera.h">
+			<Option target="scaling_potato"/>
+		</Unit>
 		<Unit filename="/home/elviento/stuff/projects/rnd/scaling-potato/scaling_potato/scaling_potato_c/cpp_code/test_opencv.cpp">
 			<Option target="scaling_potato"/>
 		</Unit>

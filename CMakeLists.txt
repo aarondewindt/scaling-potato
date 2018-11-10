@@ -15,7 +15,7 @@ set(SP_PYTHON_FILES
         scaling_potato/world.py)
 
 set(SP_SOURCES
-        scaling_potato/scaling_potato_c/cpp_code/test_opencv.cpp scaling_potato/scaling_potato_c/cpp_code/test_opencv.h)
+        scaling_potato/scaling_potato_c/cpp_code/test_opencv.cpp scaling_potato/scaling_potato_c/cpp_code/test_opencv.h scaling_potato/scaling_potato_c/cpp_code/Camera.cpp scaling_potato/scaling_potato_c/cpp_code/Camera.h)
 
 add_executable(scaling_potato ${SP_SOURCES} ${PYTHON_FILES})
 

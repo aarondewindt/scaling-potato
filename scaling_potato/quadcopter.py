@@ -1,8 +1,10 @@
 from scipy.integrate import ode
 import numpy as np
 from math import pi
-from panda3d.core import WindowProperties, VBase3, LQuaternionf, Mat4
+from panda3d.core import WindowProperties, VBase3, LQuaternionf, Mat4, FrameBufferProperties
 from scaling_potato.pid_control import PIDControl
+from scaling_potato.scaling_potato_c import test_read_texture_from_memory, Camera
+
 
 __author__ = "Aaron M. de Windt"
 
@@ -29,21 +31,37 @@ class Quadcopter(object):
         self.integrator = ode(self.rhs_equation).set_integrator('dopri5')
 
         self.pbase = pbase
-        # Create new window for the quadcopter view.
-        wp = WindowProperties()
-        wp.setSize(500, 400)
-        wp.setOrigin(0, 0)
-        win = pbase.openWindow(props=wp)  # aspectRatio=1
 
         # Create quadcopter node.
         self.node_path = pbase.render.attachNewNode("Quadcopter")
         self.node_path.setPos(*self.x)
         self.q = np.array(self.node_path.getQuat())
 
-        # Configure camera
-        self.camera = pbase.camList[-1]
-        self.camera.reparentTo(self.node_path)
-        # self.camera.setH(-90)
+        # Configure front camera
+        fb_prop = FrameBufferProperties()
+        # Request 8 RGB bits, no alpha bits, and a depth buffer.
+        fb_prop.setRgbColor(True)
+        fb_prop.setRgbaBits(8, 8, 8, 0)
+        # fb_prop.setDepthBits(16)
+
+        self.front_buffer = self.pbase.win.makeTextureBuffer("front_buffer", 256, 256, to_ram=True, fbp=fb_prop)
+        self.front_camera = self.pbase.makeCamera(self.front_buffer)
+        self.front_camera.reparentTo(self.node_path)
+
+        # self.front_camera.setH(-90)
+
+        # Configure bottom camera
+        self.bottom_buffer = self.pbase.win.makeTextureBuffer("bottom_buffer", 256, 256)
+        self.bottom_camera = self.pbase.makeCamera(self.bottom_buffer)
+        self.bottom_camera.reparentTo(self.node_path)
+        # self.bottom_camera.setP(-90)
+
+        self.pbase.accept("v", self.pbase.bufferViewer.toggleEnable)
+        self.pbase.accept("V", self.pbase.bufferViewer.toggleEnable)
+        self.pbase.bufferViewer.setPosition("llcorner")
+        self.pbase.bufferViewer.setCardSize(.5, 0.0)
+
+        self.pbase.accept("u", self.update_textures)
 
         # Load in quadcopter model
         self.model = pbase.loader.loadModel("models/plane.egg")
@@ -57,6 +75,14 @@ class Quadcopter(object):
         self.omega_pid = PIDControl(5.0, 0.0, 0.0)
 
         self.__tmat_ib = Mat4()
+
+    def update_textures(self):
+        self.front_texture = self.front_buffer.get_texture()
+        self.ram_image = self.front_texture.getRamImage()
+
+        cam = Camera()
+        cam.set_image(self.ram_image.this, self.front_texture.getXSize(), self.front_texture.getYSize())
+        cam.show_image()
 
     def v_control(self, time, v_command):
         self.v_pid.command = v_command

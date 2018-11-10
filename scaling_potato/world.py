@@ -1,3 +1,5 @@
+import sys
+import os
 from direct.showbase.ShowBase import ShowBase
 from panda3d.core import Point3, VBase4, TextNode
 from panda3d.core import AmbientLight, DirectionalLight, PointLight
@@ -15,6 +17,8 @@ import numpy as np
 from scaling_potato.quadcopter import Quadcopter
 
 __author__ = "Aaron M. de Windt"
+
+sys.path.insert(0, os.path.abspath('./'))
 
 # Function to put instructions on the screen.
 def addInstructions(pos, msg):
@@ -81,7 +85,7 @@ class World(ShowBase):
         self.taskMgr.add(self.main_loop, "main_loop")
         self.quadcopter_text = OrderedDict([(name, addInstructions((1 + i) * 0.06, name)) for i, name in enumerate(quat_params)])
 
-        self.quadcopter = Quadcopter([0, -20, 1], self)
+        self.quadcopter = Quadcopter([0, -20, 1.5], self)
         self.movements = []
 
     def update_quatcopter_text(self):

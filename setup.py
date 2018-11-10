@@ -20,9 +20,9 @@ def create_scaling_potato_ext():
     sc.add_c_source_dir("./scaling_potato/scaling_potato_c/cpp_code")
     sc.add_include_dir("./scaling_potato/scaling_potato_c/cpp_code")
 
+    # OpenCV Include
     # sc.add_library_dir(os.environ["OPENCV_LIB"])
     sc.add_include_dir(os.environ["OPENCV_INC"])
-
     sc.add_library("opencv_core")
     sc.add_library("opencv_imgproc")
     sc.add_library("opencv_imgcodecs")
@@ -34,6 +34,21 @@ def create_scaling_potato_ext():
     sc.add_library("opencv_calib3d")
     sc.add_library("opencv_objdetect")
     sc.add_library("opencv_flann")
+
+    # Python include
+    sc.add_include_dir("/usr/include/python2.7")
+
+    # Panda3d include
+    # sc.add_include_dir("/usr/include/panda3d")
+    sc.add_library_dir("/usr/lib/x86_64-linux-gnu/panda3d")
+    sc.add_library('p3framework')
+    sc.add_library('panda')
+    sc.add_library('pandafx')
+    sc.add_library('pandaexpress')
+    sc.add_library('p3dtoolconfig')
+    sc.add_library('p3dtool')
+    # sc.add_library('p3pystub')
+    sc.add_library('p3direct')
 
     printb("scaling_potato_c")
     print("="*80)
@@ -48,12 +63,12 @@ def create_scaling_potato_ext():
                     library_dirs=sc.lib_dirs,
                     libraries=sc.libraries,
                     language="c++",
-                    extra_compile_args=["-g"], #, "/Od", "/MDd"], # for release version change /Od compile arg to /O2 (optimization for maximum speed)
+                    extra_compile_args=["-g", "-std=c++11"], #, "/Od", "/MDd"], # for release version change /Od compile arg to /O2 (optimization for maximum speed)
                     # extra_link_args=["-debug"], # leave this enabled for release! :)))
                     define_macros = [('PYTHON_EXT', '1')]
                     )
 
-    ext = cythonize([ext])
+    ext = cythonize([ext], gdb_debug=True)
     print('\n'*4)
     return ext
 
